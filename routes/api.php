@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payments/midtrans', [PaymentController::class, 'createSnapToken']);
     Route::post('/payments/update-status', [PaymentController::class, 'updateStatus']);
 
+    Route::post('/appointments/{id}/update-gmeet', [AppointmentController::class, 'updateGmeet']);
+    Route::get('/admin/appointments', [AppointmentController::class, 'getAllAppointments']);
     // profile
     Route::get('/user', function (Request $request) {
         return $request->user();

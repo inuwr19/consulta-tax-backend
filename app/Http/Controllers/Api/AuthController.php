@@ -58,6 +58,7 @@ class AuthController extends Controller
             'message' => 'Login berhasil.',
             'user' => $user,
             'token' => $token,
+            'role' => $user->role,
         ]);
     }
 
@@ -65,18 +66,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Jika pakai token
-        if ($request->user()?->currentAccessToken()) {
-            $request->user()->currentAccessToken()->delete();
-        }
-
-        // Jika pakai session
+        // Jika pakai session (Sanctum dengan cookie)
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout berhasil.']);
     }
-
 
 }

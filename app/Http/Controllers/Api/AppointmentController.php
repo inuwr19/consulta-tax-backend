@@ -17,6 +17,12 @@ class AppointmentController extends Controller
         return AppointmentResource::collection(
             Appointment::with(['user', 'payment', 'consultant'])
                 ->where('user_id', auth()->id())
+                ->whereHas('payment', function ($query) {
+                    $query->where('status', 'paid'); // hanya yang sudah dibayar
+                })
+                ->where('date', '>=', now()->toDateString()) // hanya yang akan datang
+                ->orderBy('date')
+                ->orderBy('time')
                 ->get()
         );
     }
@@ -62,5 +68,32 @@ class AppointmentController extends Controller
         $appointment->delete();
         return response()->json(['message' => 'Appointment deleted.']);
     }
+
+    public function updateGmeet(Request $request, $id)
+    {
+        $request->validate([
+            'gmeet_link' => 'nullable|url',
+        ]);
+
+        $appointment = Appointment::findOrFail($id);
+        $appointment->gmeet_link = $request->gmeet_link;
+        $appointment->save();
+
+        return response()->json(['message' => 'Gmeet link updated successfully']);
+    }
+
+    public function getAllAppointments()
+    {
+        $appointments = Appointment::with(['user', 'consultant', 'payment']) // relasi sesuai kebutuhanmu
+            ->where('date', '>=', now()->toDateString())
+            ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json([
+            'data' => $appointments
+        ]);
+    }
+
+
 }
 
